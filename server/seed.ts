@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { eq } from "drizzle-orm";
 import {
   regions, topics, topicRegions, sources, articles, claims,
   viewpoints, scenarios, timelineEvents, stakeholders, watchSignals,
@@ -76,16 +77,20 @@ export async function seedDatabase() {
     { sourceId: srcMap["BBC News"], topicId: topic1.id, title: "Chip shortage fears return as trade tensions escalate", url: "#", summary: "Industry analysts warn that tit-for-tat restrictions could trigger new supply chain disruptions, particularly in automotive and consumer electronics sectors.", publishedAt: daysAgo(1), isRecent: false },
   ]).returning();
 
-  await db.insert(claims).values([
+  const t1Claims = await db.insert(claims).values([
     { topicId: topic1.id, statement: "The US Commerce Department expanded export controls to cover advanced AI training chips with processing power above 300 TOPS, effective within 90 days.", category: "what_happened", articleIds: [t1Articles[0].id], isConflicting: false },
     { topicId: topic1.id, statement: "China announced export permit requirements for gallium, germanium, and antimony—critical materials for semiconductor manufacturing—in direct response to US restrictions.", category: "what_happened", articleIds: [t1Articles[2].id], isConflicting: false },
     { topicId: topic1.id, statement: "SMIC has expanded production capacity for 28nm and 14nm chips by 40% year-over-year, focusing on mature nodes that don't require EUV lithography.", category: "what_changed", articleIds: [t1Articles[1].id], isConflicting: false },
     { topicId: topic1.id, statement: "Japan and South Korea are implementing parallel semiconductor export restrictions, creating a coordinated trilateral technology control regime.", category: "what_happened", articleIds: [t1Articles[4].id], isConflicting: false },
     { topicId: topic1.id, statement: "The global cost of semiconductor supply chain bifurcation is estimated at $1.5 trillion over the next decade.", category: "what_changed", articleIds: [t1Articles[5].id], isConflicting: true },
-    { topicId: topic1.id, statement: "Chinese industry sources claim the economic impact will be far lower, around $400 billion, as domestic substitution accelerates.", category: "what_changed", articleIds: [t1Articles[1].id, t1Articles[2].id], isConflicting: true, conflictingClaimId: 5 },
+    { topicId: topic1.id, statement: "Chinese industry sources claim the economic impact will be far lower, around $400 billion, as domestic substitution accelerates.", category: "what_changed", articleIds: [t1Articles[1].id, t1Articles[2].id], isConflicting: true },
     { topicId: topic1.id, statement: "ASML reported that 27% of its 2025 revenue came from China-based customers, creating significant compliance pressure from US policy.", category: "who_said", articleIds: [t1Articles[3].id], isConflicting: false },
     { topicId: topic1.id, statement: "Industry analysts expect renewed chip shortages in automotive and consumer electronics if retaliatory restrictions escalate further.", category: "likely_next", articleIds: [t1Articles[6].id], isConflicting: false },
-  ]);
+  ]).returning();
+
+  // Link conflicting claims: $1.5T estimate <-> $400B estimate
+  await db.update(claims).set({ conflictingClaimId: t1Claims[5].id }).where(eq(claims.id, t1Claims[4].id));
+  await db.update(claims).set({ conflictingClaimId: t1Claims[4].id }).where(eq(claims.id, t1Claims[5].id));
 
   await db.insert(viewpoints).values([
     { topicId: topic1.id, groupName: "US National Security Hawks", position: "Export controls are essential to prevent China from achieving military AI superiority", arguments: ["Advanced chips directly enable military AI systems and autonomous weapons", "Historical precedent shows technology transfers to strategic competitors create long-term security risks", "Short-term economic costs are justified by preserving technological advantage", "Allied coordination makes controls more effective and distributes economic burden"], incentives: "Maintain US technological and military superiority; prevent strategic competitor advancement", constraints: "US semiconductor industry lobbying; allied cooperation required; risk of accelerating China's self-sufficiency", articleIds: [t1Articles[0].id, t1Articles[4].id] },
@@ -150,14 +155,18 @@ export async function seedDatabase() {
     { sourceId: srcMap["The Economist"], topicId: topic2.id, title: "The Brussels Effect: will EU AI rules reshape global standards?", url: "#", summary: "Analysis of how EU regulation historically influences global standards and whether the AI Act will follow the same pattern as GDPR.", publishedAt: daysAgo(1), isRecent: false },
   ]).returning();
 
-  await db.insert(claims).values([
+  const t2Claims = await db.insert(claims).values([
     { topicId: topic2.id, statement: "The first compliance deadline of the EU AI Act has taken effect, banning AI systems that use subliminal manipulation, social scoring, and real-time remote biometric identification in public spaces.", category: "what_happened", articleIds: [t2Articles[0].id], isConflicting: false },
     { topicId: topic2.id, statement: "A survey of 200 European AI startups found 67% report increased compliance costs, with 12% actively exploring relocation outside the EU.", category: "what_changed", articleIds: [t2Articles[1].id], isConflicting: true },
-    { topicId: topic2.id, statement: "EU Commission officials dispute the relocation risk, citing data showing AI investment in Europe increased 18% year-over-year despite the regulation.", category: "what_changed", articleIds: [t2Articles[3].id], isConflicting: true, conflictingClaimId: 2 },
+    { topicId: topic2.id, statement: "EU Commission officials dispute the relocation risk, citing data showing AI investment in Europe increased 18% year-over-year despite the regulation.", category: "what_changed", articleIds: [t2Articles[3].id], isConflicting: true },
     { topicId: topic2.id, statement: "Google, Microsoft, and Meta have each established EU AI compliance teams of 50+ employees to manage AI Act requirements.", category: "who_said", articleIds: [t2Articles[2].id], isConflicting: false },
     { topicId: topic2.id, statement: "Germany is proposing regulatory sandboxes that would allow companies to test high-risk AI systems under relaxed compliance for up to 24 months.", category: "what_changed", articleIds: [t2Articles[3].id], isConflicting: false },
     { topicId: topic2.id, statement: "Civil society groups including Access Now and AlgorithmWatch called the AI Act 'the most important technology regulation since GDPR' and urged strict enforcement.", category: "who_said", articleIds: [t2Articles[4].id], isConflicting: false },
-  ]);
+  ]).returning();
+
+  // Link conflicting claims: startup relocation risk <-> EU Commission disputes
+  await db.update(claims).set({ conflictingClaimId: t2Claims[2].id }).where(eq(claims.id, t2Claims[1].id));
+  await db.update(claims).set({ conflictingClaimId: t2Claims[1].id }).where(eq(claims.id, t2Claims[2].id));
 
   await db.insert(viewpoints).values([
     { topicId: topic2.id, groupName: "EU Regulators & Safety Advocates", position: "Risk-based regulation is necessary to protect fundamental rights while enabling responsible AI innovation", arguments: ["Unregulated AI poses real risks to democratic processes, employment, and civil liberties", "The GDPR precedent shows regulation can coexist with—and even strengthen—a thriving digital economy", "Proactive regulation avoids the 'regulate after harm' pattern seen with social media", "Clear rules create market certainty that ultimately benefits responsible innovators"], incentives: "Protect EU citizens; establish global regulatory leadership; create level playing field", constraints: "Must avoid over-regulation that drives companies away; enforcement capacity limitations; need to keep pace with fast-moving technology", articleIds: [t2Articles[0].id, t2Articles[4].id] },
@@ -216,14 +225,18 @@ export async function seedDatabase() {
     { sourceId: srcMap["The Guardian"], topicId: topic3.id, title: "Analysis: the domestic political constraints blocking a deal", url: "#", summary: "Both sides face hardline domestic constituencies that view significant concessions as politically unacceptable, narrowing the negotiation space.", publishedAt: daysAgo(1), isRecent: false },
   ]).returning();
 
-  await db.insert(claims).values([
+  const t3Claims = await db.insert(claims).values([
     { topicId: topic3.id, statement: "A revised three-phase ceasefire framework has been presented by Qatari and Egyptian mediators, proposing an initial 60-day humanitarian pause.", category: "what_happened", articleIds: [t3Articles[0].id], isConflicting: false },
     { topicId: topic3.id, statement: "UN agencies report aid delivery has dropped 60% from pre-conflict levels, with medical supplies critically low in northern areas.", category: "what_happened", articleIds: [t3Articles[1].id], isConflicting: false },
     { topicId: topic3.id, statement: "The US special envoy conducted six bilateral meetings in 48 hours, the most intensive diplomatic engagement since negotiations began.", category: "who_said", articleIds: [t3Articles[2].id], isConflicting: false },
     { topicId: topic3.id, statement: "Saudi Arabia, UAE, and EU have committed preliminary reconstruction funding of $20 billion contingent on ceasefire.", category: "who_said", articleIds: [t3Articles[3].id], isConflicting: true },
-    { topicId: topic3.id, statement: "Diplomatic sources caution the $20 billion figure is aspirational, with actual committed funds closer to $8 billion.", category: "who_said", articleIds: [t3Articles[4].id], isConflicting: true, conflictingClaimId: 4 },
+    { topicId: topic3.id, statement: "Diplomatic sources caution the $20 billion figure is aspirational, with actual committed funds closer to $8 billion.", category: "who_said", articleIds: [t3Articles[4].id], isConflicting: true },
     { topicId: topic3.id, statement: "Oil prices fluctuated 3% within 24 hours as markets priced in shifting ceasefire probabilities.", category: "what_changed", articleIds: [t3Articles[4].id], isConflicting: false },
-  ]);
+  ]).returning();
+
+  // Link conflicting claims: $20B commitment <-> $8B actual
+  await db.update(claims).set({ conflictingClaimId: t3Claims[4].id }).where(eq(claims.id, t3Claims[3].id));
+  await db.update(claims).set({ conflictingClaimId: t3Claims[3].id }).where(eq(claims.id, t3Claims[4].id));
 
   await db.insert(viewpoints).values([
     { topicId: topic3.id, groupName: "International Mediators (Qatar, Egypt, US)", position: "A phased agreement is the only viable path to ending the humanitarian crisis", arguments: ["Phased approach allows confidence-building before addressing harder political issues", "Humanitarian urgency demands immediate action regardless of final status disagreements", "Reconstruction incentives can create momentum toward a durable settlement", "All parties have domestic reasons to accept a deal they can frame as a win"], incentives: "Regional stability; humanitarian relief; diplomatic achievement; energy market stability", constraints: "Cannot impose terms on sovereign parties; must balance competing interests; credibility depends on enforcement", articleIds: [t3Articles[0].id, t3Articles[2].id] },

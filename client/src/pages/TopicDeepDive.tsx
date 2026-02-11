@@ -1,7 +1,7 @@
 import { useRoute, Link } from "wouter";
 import {
   ArrowLeft, Users, Target, Clock, TrendingUp, AlertTriangle,
-  Eye, FileText, ChevronRight, Plus, Check, Newspaper, Scale
+  Eye, FileText, ChevronRight, Plus, Check, Newspaper, Scale, RefreshCw
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +18,7 @@ import { formatDistanceToNow, format } from "date-fns";
 export default function TopicDeepDive() {
   const [, params] = useRoute("/topic/:slug");
   const slug = params?.slug || "";
-  const { data: topic, isLoading } = useTopicDetail(slug);
+  const { data: topic, isLoading, isError, refetch } = useTopicDetail(slug);
   const { data: follows } = useFollows();
   const followMutation = useFollow();
   const unfollowMutation = useUnfollow();
@@ -39,6 +39,25 @@ export default function TopicDeepDive() {
             {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-32 rounded-xl" />
             ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 py-16 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Unable to load topic</h1>
+          <p className="text-sm text-gray-500 mb-6">Could not connect to the server. Please try again.</p>
+          <div className="flex gap-2 justify-center">
+            <Link href="/"><Button variant="ghost">Back to briefings</Button></Link>
+            <Button variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
           </div>
         </div>
       </div>

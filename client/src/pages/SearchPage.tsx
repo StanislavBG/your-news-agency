@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Search as SearchIcon, Globe, Newspaper, Layers, ArrowRight } from "lucide-react";
+import { Search as SearchIcon, Globe, Newspaper, Layers, ArrowRight, AlertTriangle, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export default function SearchPage() {
   const initialQuery = params.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
   const [searchTerm, setSearchTerm] = useState(initialQuery);
-  const { data: results, isLoading } = useSearch(searchTerm);
+  const { data: results, isLoading, isError, refetch } = useSearch(searchTerm);
   const follow = useFollow();
 
   useEffect(() => {
@@ -62,7 +62,18 @@ export default function SearchPage() {
           </div>
         )}
 
-        {!isLoading && searchTerm && !hasResults && (
+        {isError && searchTerm && (
+          <div className="text-center py-12">
+            <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+            <h2 className="text-lg font-semibold text-gray-700 mb-1">Search failed</h2>
+            <p className="text-sm text-gray-500 mb-4">Could not connect to the server. Please try again.</p>
+            <Button variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </div>
+        )}
+
+        {!isLoading && !isError && searchTerm && !hasResults && (
           <div className="text-center py-12">
             <SearchIcon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <h2 className="text-lg font-semibold text-gray-700 mb-1">No results for "{searchTerm}"</h2>
