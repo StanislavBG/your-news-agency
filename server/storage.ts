@@ -49,6 +49,11 @@ export interface LandingData {
   recentUpdates: { topic: TopicSummary; claim: Claim }[];
 }
 
+export interface OnboardingData {
+  regions: Region[];
+  topics: TopicSummary[];
+}
+
 export interface SearchResult {
   topics: TopicSummary[];
   regions: Region[];
@@ -293,6 +298,18 @@ export class DatabaseStorage {
       .filter(Boolean) as { topic: TopicSummary; claim: Claim }[];
 
     return { topicsByRegion, topicsByCategory, recentUpdates };
+  }
+
+  // ── Onboarding Data ─────────────────────────────────────
+  async getOnboardingData(sessionId?: string): Promise<OnboardingData> {
+    const [allRegions, allTopics] = await Promise.all([
+      this.getRegions(),
+      this.getTopics(),
+    ]);
+    const topicSummaries = await Promise.all(
+      allTopics.map(t => this.getTopicSummary(t, sessionId))
+    );
+    return { regions: allRegions, topics: topicSummaries };
   }
 
   // ── Search ─────────────────────────────────────────────

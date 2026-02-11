@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/news/Header";
-import { useRegions, useTopics, useFollow, useSaveGoals, useFollows } from "@/hooks/use-news";
+import { useOnboardingData, useFollow, useSaveGoals, useFollows } from "@/hooks/use-news";
 
 const GOALS = [
   { id: "vote", label: "Vote & Participate", description: "Understand tradeoffs, stakes, and what changes if X happens", icon: Vote },
@@ -20,8 +20,9 @@ export default function Onboarding() {
   const [selectedRegions, setSelectedRegions] = useState<number[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
 
-  const { data: regions, isError: regionsError, refetch: refetchRegions } = useRegions();
-  const { data: topics, isError: topicsError, refetch: refetchTopics } = useTopics();
+  const { data: onboarding, isError: onboardingError, refetch: refetchOnboarding } = useOnboardingData();
+  const regions = onboarding?.regions;
+  const topics = onboarding?.topics;
   const { data: follows } = useFollows();
   const followMutation = useFollow();
   const saveGoals = useSaveGoals();
@@ -110,20 +111,20 @@ export default function Onboarding() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Which regions matter to you?</h1>
             <p className="text-gray-500 mb-6">Select the areas you want to track. You can change this anytime.</p>
 
-            {regionsError && (
+            {onboardingError && (
               <div className="text-center py-8 mb-4">
                 <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 mb-3">Could not load regions from the server.</p>
-                <Button variant="outline" size="sm" onClick={() => refetchRegions()}>
+                <Button variant="outline" size="sm" onClick={() => refetchOnboarding()}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Retry
                 </Button>
               </div>
             )}
-            {!regionsError && (!regions || regions.length === 0) && (
+            {!onboardingError && (!regions || regions.length === 0) && (
               <div className="text-center py-8 mb-4">
                 <Globe className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 mb-3">No regions available yet. The database may still be initializing.</p>
-                <Button variant="outline" size="sm" onClick={() => refetchRegions()}>
+                <Button variant="outline" size="sm" onClick={() => refetchOnboarding()}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Refresh
                 </Button>
               </div>
@@ -170,20 +171,20 @@ export default function Onboarding() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Pick a few topics to start</h1>
             <p className="text-gray-500 mb-6">Follow topics to build your personalized briefing feed.</p>
 
-            {topicsError && (
+            {onboardingError && (
               <div className="text-center py-8 mb-4">
                 <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 mb-3">Could not load topics from the server.</p>
-                <Button variant="outline" size="sm" onClick={() => refetchTopics()}>
+                <Button variant="outline" size="sm" onClick={() => refetchOnboarding()}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Retry
                 </Button>
               </div>
             )}
-            {!topicsError && (!topics || topics.length === 0) && (
+            {!onboardingError && (!topics || topics.length === 0) && (
               <div className="text-center py-8 mb-4">
                 <Layers className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                 <p className="text-sm text-gray-500 mb-3">No topics available yet. The database may still be initializing.</p>
-                <Button variant="outline" size="sm" onClick={() => refetchTopics()}>
+                <Button variant="outline" size="sm" onClick={() => refetchOnboarding()}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Refresh
                 </Button>
               </div>

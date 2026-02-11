@@ -3,7 +3,7 @@ import type { Server } from "http";
 import { storage } from "./storage";
 import { seedDatabase } from "./seed";
 import { ensureTablesExist } from "./db";
-import { insertFollowSchema, insertGoalSchema } from "@shared/schema";
+import { insertFollowSchema } from "@shared/schema";
 import crypto from "crypto";
 
 function getSessionId(req: any): string {
@@ -54,30 +54,7 @@ export async function registerRoutes(
     }
   });
 
-  // ── Regions ────────────────────────────────────────────
-  app.get("/api/regions", async (_req, res) => {
-    try {
-      const data = await storage.getRegions();
-      res.json(data);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to load regions" });
-    }
-  });
-
-  // ── Topics ─────────────────────────────────────────────
-  app.get("/api/topics", async (req: any, res) => {
-    try {
-      const sessionId = getSessionId(req);
-      const allTopics = await storage.getTopics();
-      const summaries = await Promise.all(
-        allTopics.map(t => storage.getTopicSummary(t, sessionId))
-      );
-      res.json(summaries);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to load topics" });
-    }
-  });
-
+  // ── Topic Detail ──────────────────────────────────────
   app.get("/api/topics/:slug", async (req: any, res) => {
     try {
       const topic = await storage.getTopicBySlug(req.params.slug);
@@ -86,17 +63,6 @@ export async function registerRoutes(
       res.json(detail);
     } catch (error) {
       res.status(500).json({ message: "Failed to load topic detail" });
-    }
-  });
-
-  app.get("/api/topics/:slug/briefing", async (req: any, res) => {
-    try {
-      const topic = await storage.getTopicBySlug(req.params.slug);
-      if (!topic) return res.status(404).json({ message: "Topic not found" });
-      const detail = await storage.getTopicDetail(topic.id);
-      res.json(detail);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to load briefing" });
     }
   });
 
@@ -170,6 +136,17 @@ export async function registerRoutes(
       res.json(result);
     } catch (error) {
       res.status(500).json({ message: "Failed to save goals" });
+    }
+  });
+
+  // ── Onboarding Data ───────────────────────────────────
+  app.get("/api/onboarding", async (req: any, res) => {
+    try {
+      const sessionId = getSessionId(req);
+      const data = await storage.getOnboardingData(sessionId);
+      res.json(data);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to load onboarding data" });
     }
   });
 

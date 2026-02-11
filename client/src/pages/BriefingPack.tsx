@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/news/Header";
 import { InlineCitation, SourceDiversityIndicator } from "@/components/news/SourceCitation";
 import { ClaimWithCitation, ConflictingClaimsPanel } from "@/components/news/ConflictIndicator";
-import { useTopicBriefing } from "@/hooks/use-news";
+import { useTopicDetail } from "@/hooks/use-news";
 import { formatDistanceToNow, format } from "date-fns";
 import { useState } from "react";
 
@@ -50,7 +50,7 @@ function BriefingSection({
 export default function BriefingPack() {
   const [, params] = useRoute("/topic/:slug/briefing");
   const slug = params?.slug || "";
-  const { data: topic, isLoading, isError, refetch } = useTopicBriefing(slug);
+  const { data: topic, isLoading, isError, refetch } = useTopicDetail(slug);
 
   if (isLoading) {
     return (
