@@ -297,25 +297,31 @@ export class DatabaseStorage {
 
   // ── Search ─────────────────────────────────────────────
   async search(query: string, sessionId?: string): Promise<SearchResult> {
-    const pattern = `%${query}%`;
+    // Split query into individual words and create a pattern for each,
+    // so "Crypto Laws in US" matches any field containing any of those words
+    const words = query.split(/\s+/).filter(w => w.length > 0);
+    const patterns = words.map(w => `%${w}%`);
 
-    // Search topics
-    const matchedTopics = await db.select().from(topics).where(
-      or(ilike(topics.title, pattern), ilike(topics.description, pattern), ilike(topics.category, pattern))
-    );
+    // Build OR conditions: each word against each searchable field
+    const topicConditions = patterns.flatMap(p => [
+      ilike(topics.title, p), ilike(topics.description, p), ilike(topics.category, p),
+    ]);
+    const matchedTopics = await db.select().from(topics).where(or(...topicConditions));
     const topicSummaries = await Promise.all(
       matchedTopics.map(t => this.getTopicSummary(t, sessionId))
     );
 
     // Search regions
-    const matchedRegions = await db.select().from(regions).where(
-      or(ilike(regions.name, pattern), ilike(regions.description, pattern))
-    );
+    const regionConditions = patterns.flatMap(p => [
+      ilike(regions.name, p), ilike(regions.description, p),
+    ]);
+    const matchedRegions = await db.select().from(regions).where(or(...regionConditions));
 
     // Search articles
-    const matchedArticles = await db.select().from(articles).where(
-      or(ilike(articles.title, pattern), ilike(articles.summary, pattern))
-    );
+    const articleConditions = patterns.flatMap(p => [
+      ilike(articles.title, p), ilike(articles.summary, p),
+    ]);
+    const matchedArticles = await db.select().from(articles).where(or(...articleConditions));
     const allSources = await db.select().from(sources);
     const sourceMap = new Map(allSources.map(s => [s.id, s]));
     const articlesWithSources = matchedArticles.map(a => ({
