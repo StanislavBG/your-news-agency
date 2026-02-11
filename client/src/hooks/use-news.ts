@@ -9,30 +9,12 @@ export function useLandingData() {
   });
 }
 
-export function useTopics() {
-  return useQuery<any[]>({
-    queryKey: ["/api/topics"],
-  });
-}
-
 export function useTopicDetail(slug: string) {
   return useQuery<any>({
     queryKey: ["/api/topics", slug],
     queryFn: async () => {
       const res = await fetch(`/api/topics/${slug}`, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to load topic");
-      return res.json();
-    },
-    enabled: !!slug,
-  });
-}
-
-export function useTopicBriefing(slug: string) {
-  return useQuery<any>({
-    queryKey: ["/api/topics", slug, "briefing"],
-    queryFn: async () => {
-      const res = await fetch(`/api/topics/${slug}/briefing`, { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to load briefing");
       return res.json();
     },
     enabled: !!slug,
@@ -51,9 +33,9 @@ export function useSearch(query: string) {
   });
 }
 
-export function useRegions() {
-  return useQuery<any[]>({
-    queryKey: ["/api/regions"],
+export function useOnboardingData() {
+  return useQuery<any>({
+    queryKey: ["/api/onboarding"],
   });
 }
 
@@ -73,7 +55,7 @@ export function useFollow() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/follows"] });
       queryClient.invalidateQueries({ queryKey: ["/api/landing"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/topics"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding"] });
       queryClient.invalidateQueries({ queryKey: ["/api/suggestions"] });
     },
   });
@@ -89,7 +71,7 @@ export function useUnfollow() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/follows"] });
       queryClient.invalidateQueries({ queryKey: ["/api/landing"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/topics"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/onboarding"] });
       queryClient.invalidateQueries({ queryKey: ["/api/suggestions"] });
     },
   });
