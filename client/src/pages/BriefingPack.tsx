@@ -1,7 +1,7 @@
 import { useRoute, Link } from "wouter";
 import {
   ArrowLeft, Target, TrendingUp, Users, Scale, Clock,
-  Compass, Eye as EyeIcon, AlertTriangle, FileText, ChevronDown, ChevronUp
+  Compass, Eye as EyeIcon, AlertTriangle, FileText, ChevronDown, ChevronUp, RefreshCw
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +50,7 @@ function BriefingSection({
 export default function BriefingPack() {
   const [, params] = useRoute("/topic/:slug/briefing");
   const slug = params?.slug || "";
-  const { data: topic, isLoading } = useTopicBriefing(slug);
+  const { data: topic, isLoading, isError, refetch } = useTopicBriefing(slug);
 
   if (isLoading) {
     return (
@@ -63,6 +63,25 @@ export default function BriefingPack() {
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-24 rounded-xl mb-4" />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Unable to load briefing</h1>
+          <p className="text-sm text-gray-500 mb-6">Could not connect to the server. Please try again.</p>
+          <div className="flex gap-2 justify-center">
+            <Link href="/"><Button variant="ghost">Back to briefings</Button></Link>
+            <Button variant="outline" onClick={() => refetch()}>
+              <RefreshCw className="w-4 h-4 mr-2" /> Retry
+            </Button>
+          </div>
         </div>
       </div>
     );

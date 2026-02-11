@@ -10,9 +10,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Header from "@/components/news/Header";
 import TopicCard from "@/components/news/TopicCard";
 import { useLandingData, useFollows, useFollow, useUnfollow, useSuggestions } from "@/hooks/use-news";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 export default function Landing() {
-  const { data: landing, isLoading } = useLandingData();
+  const { data: landing, isLoading, isError, error, refetch } = useLandingData();
   const { data: follows } = useFollows();
   const { data: suggestions } = useSuggestions();
   const follow = useFollow();
@@ -52,6 +53,24 @@ export default function Landing() {
               <Skeleton key={i} className="h-48 rounded-xl" />
             ))}
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
+          <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Unable to load briefings</h1>
+          <p className="text-sm text-gray-500 mb-6 max-w-md mx-auto">
+            {error?.message || "Could not connect to the server. Please try again."}
+          </p>
+          <Button variant="outline" onClick={() => refetch()}>
+            <RefreshCw className="w-4 h-4 mr-2" /> Try Again
+          </Button>
         </div>
       </div>
     );

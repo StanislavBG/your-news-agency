@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation, Link } from "wouter";
-import { Vote, TrendingUp, Briefcase, Check, ChevronRight, ArrowLeft, Globe, Layers } from "lucide-react";
+import { Vote, TrendingUp, Briefcase, Check, ChevronRight, ArrowLeft, Globe, Layers, AlertTriangle, RefreshCw } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,8 +20,8 @@ export default function Onboarding() {
   const [selectedRegions, setSelectedRegions] = useState<number[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<number[]>([]);
 
-  const { data: regions } = useRegions();
-  const { data: topics } = useTopics();
+  const { data: regions, isError: regionsError, refetch: refetchRegions } = useRegions();
+  const { data: topics, isError: topicsError, refetch: refetchTopics } = useTopics();
   const { data: follows } = useFollows();
   const followMutation = useFollow();
   const saveGoals = useSaveGoals();
@@ -110,6 +110,15 @@ export default function Onboarding() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Which regions matter to you?</h1>
             <p className="text-gray-500 mb-6">Select the areas you want to track. You can change this anytime.</p>
 
+            {regionsError && (
+              <div className="text-center py-8 mb-4">
+                <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">Could not load regions from the server.</p>
+                <Button variant="outline" size="sm" onClick={() => refetchRegions()}>
+                  <RefreshCw className="w-4 h-4 mr-1" /> Retry
+                </Button>
+              </div>
+            )}
             <div className="grid gap-2 sm:grid-cols-2">
               {(regions || []).map((region: any) => {
                 const selected = selectedRegions.includes(region.id);
@@ -152,6 +161,15 @@ export default function Onboarding() {
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Pick a few topics to start</h1>
             <p className="text-gray-500 mb-6">Follow topics to build your personalized briefing feed.</p>
 
+            {topicsError && (
+              <div className="text-center py-8 mb-4">
+                <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">Could not load topics from the server.</p>
+                <Button variant="outline" size="sm" onClick={() => refetchTopics()}>
+                  <RefreshCw className="w-4 h-4 mr-1" /> Retry
+                </Button>
+              </div>
+            )}
             <div className="space-y-2">
               {(topics || []).map((topic: any) => {
                 const selected = selectedTopics.includes(topic.id);
