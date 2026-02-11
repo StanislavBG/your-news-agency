@@ -2,6 +2,7 @@ import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
 import { seedDatabase } from "./seed";
+import { ensureTablesExist } from "./db";
 import { insertFollowSchema, insertGoalSchema } from "@shared/schema";
 import crypto from "crypto";
 
@@ -32,13 +33,13 @@ export async function registerRoutes(
     next();
   });
 
-  // Seed database on startup
+  // Ensure tables exist, then seed
   try {
+    await ensureTablesExist();
     await seedDatabase();
-    console.log("Database seed check complete.");
+    console.log("Database ready.");
   } catch (error: any) {
-    console.error("Failed to seed database. If tables don't exist, run: npm run db:push");
-    console.error("Seed error:", error?.message || error);
+    console.error("Database setup error:", error?.message || error);
   }
 
   // ── Landing Data ───────────────────────────────────────
