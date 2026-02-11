@@ -6,9 +6,18 @@ import {
 } from "@shared/schema";
 
 export async function seedDatabase() {
-  // Check if already seeded
-  const existingTopics = await db.select().from(topics);
-  if (existingTopics.length > 0) return;
+  // Check if already seeded - wrap in try/catch in case tables don't exist yet
+  try {
+    const existingTopics = await db.select().from(topics);
+    if (existingTopics.length > 0) {
+      console.log("Database already seeded, skipping.");
+      return;
+    }
+  } catch (err: any) {
+    // Table may not exist yet (db:push hasn't run) - the inserts below will also fail
+    console.warn("Could not check existing topics (tables may not exist yet):", err?.message);
+    throw err;
+  }
 
   console.log("Seeding database with news data...");
 

@@ -132,88 +132,118 @@ export default function Landing() {
 
             {/* BY TOPIC */}
             <TabsContent value="topic">
-              {/* Followed topics first */}
-              {hasFollows && followedTopics.length > 0 && (
-                <div className="mb-8">
-                  <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" /> Your Feed
-                  </h2>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {followedTopics.map((topic: any) => (
-                      <TopicCard key={topic.id} topic={topic} showFollowReason />
-                    ))}
-                  </div>
+              {topicsByCategory.length === 0 ? (
+                <div className="text-center py-16">
+                  <Layers className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <h2 className="text-lg font-semibold text-gray-700 mb-1">No topics available yet</h2>
+                  <p className="text-sm text-gray-500 max-w-md mx-auto">
+                    The database may still be initializing. Try refreshing the page in a moment.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+                    <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+                  </Button>
                 </div>
-              )}
+              ) : (
+                <>
+                  {/* Followed topics first */}
+                  {hasFollows && followedTopics.length > 0 && (
+                    <div className="mb-8">
+                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4" /> Your Feed
+                      </h2>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {followedTopics.map((topic: any) => (
+                          <TopicCard key={topic.id} topic={topic} showFollowReason />
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-              {/* All topics by category */}
-              {topicsByCategory.map((group: any) => (
-                <div key={group.category} className="mb-8">
-                  <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
-                    {group.category}
-                  </h2>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {group.topics.map((topic: any) => (
-                      <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
-                    ))}
-                  </div>
-                </div>
-              ))}
+                  {/* All topics by category */}
+                  {topicsByCategory.map((group: any) => (
+                    <div key={group.category} className="mb-8">
+                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                        {group.category}
+                      </h2>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {group.topics.map((topic: any) => (
+                          <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </TabsContent>
 
             {/* BY REGION */}
             <TabsContent value="region">
-              {/* Region chips for quick follow */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {topicsByRegion.map((group: any) => {
-                  const isFollowed = followedRegionIds.includes(group.region.id);
-                  return (
-                    <Button
-                      key={group.region.id}
-                      variant={isFollowed ? "secondary" : "outline"}
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => toggleRegionFollow(group.region.id)}
-                    >
-                      {isFollowed ? (
-                        <Check className="w-3 h-3 mr-1" />
-                      ) : (
-                        <Plus className="w-3 h-3 mr-1" />
-                      )}
-                      {group.region.name}
-                    </Button>
-                  );
-                })}
-              </div>
-
-              {topicsByRegion.map((group: any) => (
-                <div key={group.region.id} className="mb-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-gray-400" />
-                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-                        {group.region.name}
-                      </h2>
-                      <Badge variant="outline" className="text-[10px]">
-                        {group.topics.length} topic{group.topics.length !== 1 ? "s" : ""}
-                      </Badge>
-                    </div>
-                    <Button
-                      variant={followedRegionIds.includes(group.region.id) ? "secondary" : "ghost"}
-                      size="sm"
-                      className="h-7 text-xs"
-                      onClick={() => toggleRegionFollow(group.region.id)}
-                    >
-                      {followedRegionIds.includes(group.region.id) ? "Following" : "Follow Region"}
-                    </Button>
-                  </div>
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {group.topics.map((topic: any) => (
-                      <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
-                    ))}
-                  </div>
+              {topicsByRegion.length === 0 ? (
+                <div className="text-center py-16">
+                  <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <h2 className="text-lg font-semibold text-gray-700 mb-1">No regions available yet</h2>
+                  <p className="text-sm text-gray-500 max-w-md mx-auto">
+                    The database may still be initializing. Try refreshing the page in a moment.
+                  </p>
+                  <Button variant="outline" size="sm" className="mt-4" onClick={() => window.location.reload()}>
+                    <RefreshCw className="w-4 h-4 mr-2" /> Refresh
+                  </Button>
                 </div>
-              ))}
+              ) : (
+                <>
+                  {/* Region chips for quick follow */}
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {topicsByRegion.map((group: any) => {
+                      const isFollowed = followedRegionIds.includes(group.region.id);
+                      return (
+                        <Button
+                          key={group.region.id}
+                          variant={isFollowed ? "secondary" : "outline"}
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => toggleRegionFollow(group.region.id)}
+                        >
+                          {isFollowed ? (
+                            <Check className="w-3 h-3 mr-1" />
+                          ) : (
+                            <Plus className="w-3 h-3 mr-1" />
+                          )}
+                          {group.region.name}
+                        </Button>
+                      );
+                    })}
+                  </div>
+
+                  {topicsByRegion.map((group: any) => (
+                    <div key={group.region.id} className="mb-8">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <Globe className="w-4 h-4 text-gray-400" />
+                          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                            {group.region.name}
+                          </h2>
+                          <Badge variant="outline" className="text-[10px]">
+                            {group.topics.length} topic{group.topics.length !== 1 ? "s" : ""}
+                          </Badge>
+                        </div>
+                        <Button
+                          variant={followedRegionIds.includes(group.region.id) ? "secondary" : "ghost"}
+                          size="sm"
+                          className="h-7 text-xs"
+                          onClick={() => toggleRegionFollow(group.region.id)}
+                        >
+                          {followedRegionIds.includes(group.region.id) ? "Following" : "Follow Region"}
+                        </Button>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                        {group.topics.map((topic: any) => (
+                          <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </>
+              )}
             </TabsContent>
           </Tabs>
 
