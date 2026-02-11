@@ -32,11 +32,13 @@ export async function registerRoutes(
     next();
   });
 
-  // Seed database
+  // Seed database on startup
   try {
     await seedDatabase();
-  } catch (error) {
-    console.error("Failed to seed database:", error);
+    console.log("Database seed check complete.");
+  } catch (error: any) {
+    console.error("Failed to seed database. If tables don't exist, run: npm run db:push");
+    console.error("Seed error:", error?.message || error);
   }
 
   // ── Landing Data ───────────────────────────────────────

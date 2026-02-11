@@ -119,6 +119,15 @@ export default function Onboarding() {
                 </Button>
               </div>
             )}
+            {!regionsError && (!regions || regions.length === 0) && (
+              <div className="text-center py-8 mb-4">
+                <Globe className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">No regions available yet. The database may still be initializing.</p>
+                <Button variant="outline" size="sm" onClick={() => refetchRegions()}>
+                  <RefreshCw className="w-4 h-4 mr-1" /> Refresh
+                </Button>
+              </div>
+            )}
             <div className="grid gap-2 sm:grid-cols-2">
               {(regions || []).map((region: any) => {
                 const selected = selectedRegions.includes(region.id);
@@ -167,6 +176,15 @@ export default function Onboarding() {
                 <p className="text-sm text-gray-500 mb-3">Could not load topics from the server.</p>
                 <Button variant="outline" size="sm" onClick={() => refetchTopics()}>
                   <RefreshCw className="w-4 h-4 mr-1" /> Retry
+                </Button>
+              </div>
+            )}
+            {!topicsError && (!topics || topics.length === 0) && (
+              <div className="text-center py-8 mb-4">
+                <Layers className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                <p className="text-sm text-gray-500 mb-3">No topics available yet. The database may still be initializing.</p>
+                <Button variant="outline" size="sm" onClick={() => refetchTopics()}>
+                  <RefreshCw className="w-4 h-4 mr-1" /> Refresh
                 </Button>
               </div>
             )}
