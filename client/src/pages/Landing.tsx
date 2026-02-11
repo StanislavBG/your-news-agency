@@ -48,9 +48,9 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <Skeleton className="h-10 w-64 mb-4" />
           <Skeleton className="h-6 w-96 mb-8" />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-5 md:grid-cols-2">
             {[...Array(6)].map((_, i) => (
-              <Skeleton key={i} className="h-48 rounded-xl" />
+              <Skeleton key={i} className="h-56 rounded-xl" />
             ))}
           </div>
         </div>
@@ -147,11 +147,11 @@ export default function Landing() {
                 <>
                   {/* Followed topics first */}
                   {hasFollows && followedTopics.length > 0 && (
-                    <div className="mb-8">
-                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <div className="mb-10">
+                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5 flex items-center gap-2">
                         <TrendingUp className="w-4 h-4" /> Your Feed
                       </h2>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      <div className="grid gap-5 md:grid-cols-2">
                         {followedTopics.map((topic: any) => (
                           <TopicCard key={topic.id} topic={topic} showFollowReason />
                         ))}
@@ -161,11 +161,11 @@ export default function Landing() {
 
                   {/* All topics by category */}
                   {topicsByCategory.map((group: any) => (
-                    <div key={group.category} className="mb-8">
-                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                    <div key={group.category} className="mb-10">
+                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-5">
                         {group.category}
                       </h2>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      <div className="grid gap-5 md:grid-cols-2">
                         {group.topics.map((topic: any) => (
                           <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
                         ))}
@@ -235,7 +235,7 @@ export default function Landing() {
                           {followedRegionIds.includes(group.region.id) ? "Following" : "Follow Region"}
                         </Button>
                       </div>
-                      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                      <div className="grid gap-5 md:grid-cols-2">
                         {group.topics.map((topic: any) => (
                           <TopicCard key={topic.id} topic={topic} showFollowReason={hasFollows} />
                         ))}
@@ -253,7 +253,7 @@ export default function Landing() {
               <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                 Suggested for You
               </h2>
-              <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {suggestions.map((topic: any) => (
                   <TopicCard key={topic.id} topic={topic} compact showFollowReason />
                 ))}
